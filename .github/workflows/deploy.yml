@@ -1,0 +1,26 @@
+name: Continuous Delivery (Deploy to Minikube)
+
+# Trigger this workflow whenever you make changes to Helm charts inside minikube_test repo
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy-to-minikube:
+    runs-on: [self-hosted, local-kube] # Runs on your local VirtualBox runner
+
+    steps:
+      # Step 1: Check out the infrastructure code (Helm charts)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Deploy everything via Helm
+      - name: Deploy to Minikube via Helm
+        run: |
+          echo "Starting infrastructure deployment..."
+          # Helm will fetch the docker image path defined in your values.yaml
+          helm upgrade --install my-release ./charts/my-devops-app --set image.pullPolicy=Always
+          
+          # Monitor the rolling update status in the local cluster
+          kubectl rollout status deployment/my-release-my-devops-app --timeout=60s
+
