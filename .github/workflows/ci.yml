@@ -1,0 +1,21 @@
+# Add this job at the very bottom of your ci.yml file, aligned with build-and-push job
+  deploy-to-minikube:
+    needs: build-and-push # Run only after the image is successfully built and pushed
+    runs-on: [self-hosted, local-kube] # Targets your VirtualBox runner
+
+    steps:
+      # Step 1: Check out the repository to get the latest Helm charts
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Deploy the updated Helm chart to local Minikube
+      # The local runner already has kubectl and helm installed and configured
+      - name: Deploy to Minikube via Helm
+        run: |
+          echo "Starting CD deployment pipeline..."
+          # Force kubernetes to pull the fresh 'latest' image from GHCR
+          helm upgrade --install my-release ./charts/my-devops-app --set image.pullPolicy=Always
+          
+          # Verify the deployment status
+          kubectl rollout status deployment/my-release-my-devops-app --timeout=60s
+
