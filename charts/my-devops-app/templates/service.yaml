@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "my-devops-app.fullname" . }}
+  labels:
+    {{- include "my-devops-app.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    # 1. FastAPI
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
+      name: http
+
+    # 2. Prometheus (на всякий случай)
+    - port: 9090
+      targetPort: 9090
+      protocol: TCP
+      name: prometheus
+
+    # 3. Grafana (КРИТИЧНО ДЛЯ НАШЕЙ ОШИБКИ)
+    - port: 3000
+      targetPort: 3000  # Проверьте, чтобы здесь было 3000
+      protocol: TCP
+      name: grafana     # Имя должно быть строго "grafana" маленькими буквами
+  selector:
+    {{- include "my-devops-app.selectorLabels" . | nindent 4 }}
+

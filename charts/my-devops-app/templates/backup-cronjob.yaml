@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: prometheus-backup-job
+spec:
+  # Run the backup precisely every 30 minutes
+  schedule: "*/30 * * * *" 
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+            # Persistent storage containing active Prometheus TSDB database
+            - name: prometheus-storage
+              persistentVolumeClaim:
+                claimName: prometheus-storage-pvc
+            # Secure storage location on the actual Minikube virtual machine host
+            - name: backup-storage
+              hostPath:
+                path: /data/prometheus-backups
+          containers:
+            - name: backup-worker
+              image: alpine:3.18
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  BACKUP_NAME="prom-db-backup-$(date +%Y%m%d-%H%M%S).tar.gz"
+                  echo "Starting Prometheus database backup pipeline..."
+                  tar -czf /backups/$BACKUP_NAME -C /prometheus .
+                  echo "Backup successfully archived to host storage: /backups/$BACKUP_NAME"
+              volumeMounts:
+                - name: prometheus-storage
+                  mountPath: /prometheus
+                  readOnly: true # Security best practice: worker only reads data
+                - name: backup-storage
+                  mountPath: /backups
+          restartPolicy: OnFailure
+

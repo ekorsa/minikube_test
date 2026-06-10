@@ -1,0 +1,55 @@
+# --- Target image settings from GitHub Packages ---
+image:
+  repository: ghcr.io/ekorsa/fastapi_docker_test # Change to your repository path
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+# Secret name we created in Step 2 to pull images from GHCR
+imagePullSecrets:
+  - name: ghcr-secret
+
+# Name override configuration
+nameOverride: ""
+fullnameOverride: ""
+
+# Number of application replicas (Pods) to run
+replicaCount: 2
+
+# Pod security settings
+podAnomalies: {}
+podSecurityContext: {}
+securityContext: {}
+
+# Networking settings inside the cluster
+service:
+  type: ClusterIP
+  port: 8000  # The port your FastAPI application listens on
+
+# Ingress controller settings to access app from host browser
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: my-app.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+          port: "http"
+
+    - host: grafana.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+          port: "grafana"
+  tls: []
+
+# Resource configuration (left empty for local testing)
+resources: {}
+autoscaling:
+  enabled: false
+nodeSelector: {}
+tolerations: []
+affinity: {}
+

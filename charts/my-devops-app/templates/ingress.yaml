@@ -1,0 +1,36 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "my-devops-app.fullname" . }}
+  labels:
+    {{- include "my-devops-app.labels" . | nindent 4 }}
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+    # Route 1: FastAPI Application
+    - host: my-app.local
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ include "my-devops-app.fullname" . }}
+                port:
+                  name: http
+
+    # Route 2: Grafana Dashboard
+    - host: grafana.local
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ include "my-devops-app.fullname" . }}
+                port:
+                  name: grafana
+{{- end }}
+
