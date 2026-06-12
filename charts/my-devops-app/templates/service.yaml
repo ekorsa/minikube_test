@@ -13,17 +13,17 @@ spec:
       protocol: TCP
       name: http
 
-    # 2. Prometheus (на всякий случай)
+    # 2. Prometheus
     - port: 9090
       targetPort: 9090
       protocol: TCP
       name: prometheus
 
-    # 3. Grafana (КРИТИЧНО ДЛЯ НАШЕЙ ОШИБКИ)
+    # 3. Grafana
     - port: 3000
-      targetPort: 3000  # Проверьте, чтобы здесь было 3000
+      targetPort: 3000
       protocol: TCP
-      name: grafana     # Имя должно быть строго "grafana" маленькими буквами
+      name: grafana
   selector:
     {{- include "my-devops-app.selectorLabels" . | nindent 4 }}
 

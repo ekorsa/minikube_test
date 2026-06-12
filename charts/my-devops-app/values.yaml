@@ -1,9 +1,9 @@
 # --- Target image settings from GitHub Packages ---
 image:
   repository: ghcr.io/ekorsa/fastapi_docker_test # Change to your repository path
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  tag: "sha-26d54dd"
 
 # Secret name we created in Step 2 to pull images from GHCR
 imagePullSecrets:
