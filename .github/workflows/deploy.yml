@@ -19,8 +19,11 @@ jobs:
         run: |
           echo "Starting infrastructure deployment..."
           # Helm will fetch the docker image path defined in your values.yaml
-          helm upgrade --install my-release ./charts/my-devops-app --set image.pullPolicy=Always
-          
+          helm upgrade --install my-release ./charts/my-devops-app \
+            --namespace my-devops-app \
+            --create-namespace \
+            --set image.pullPolicy=Always
+
           # Monitor the rolling update status in the local cluster
-          kubectl rollout status deployment/my-release-my-devops-app --timeout=60s
+          kubectl rollout status deployment/my-release-my-devops-app -n my-devops-app --timeout=180s
 
